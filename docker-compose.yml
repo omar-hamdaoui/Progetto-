@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  faceapp:
+    build: .
+    volumes:
+      - ./data:/app/data       # dataset/modelli persistenti
+      - ./:/app:cached         # montare il codice per dev (usa cached per migliori perf)
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1

@@ -1,0 +1,4 @@
+# Dipendenze Python del progetto
+# Aggiungi qui altre librerie necessarie (es. Flask, FastAPI, numpy, ecc.)
+dlib<20
+face-recognition
