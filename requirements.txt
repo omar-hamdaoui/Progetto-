@@ -2,3 +2,4 @@
 # Aggiungi qui altre librerie necessarie (es. Flask, FastAPI, numpy, ecc.)
 dlib<20
 face-recognition
+Flask>=2.2,<3.0  # server web
