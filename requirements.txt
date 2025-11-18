@@ -3,3 +3,8 @@
 dlib<20
 face-recognition
 Flask>=2.2,<3.0  # server web
+# Librerie utili per elaborazione immagini e compatibilità
+# data-science deps
+numpy>=1.26,<2.0
+pillow>=9.4,<11.0
+opencv-python-headless>=4.8,<5.0
