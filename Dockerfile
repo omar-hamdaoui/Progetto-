@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # install build deps + runtime tools (curl per healthcheck)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake git wget curl ca-certificates \
-    libjpeg-dev libpng-dev libopenblas-dev libblas-dev liblapack-dev pkg-config \
+    libjpeg-dev libpng-dev libopenblas-dev libatlas3-base liblapack-dev pkg-config \
     python3-dev libboost-all-dev libatlas-base-dev zlib1g-dev libx11-dev libgtk-3-dev libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
