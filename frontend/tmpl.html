@@ -4,518 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FaceCheck</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0e27;
-            color: #e4e6eb;
-            min-height: 100vh;
-        }
-
-        header {
-            background: #1a1f37;
-            border-bottom: 1px solid #2a2f47;
-            padding: 16px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        header nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 16px;
-            font-weight: 700;
-            color: #7c3aed;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 28px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #a0a8b8;
-            font-size: 13px;
-            cursor: pointer;
-            transition: color 0.15s;
-        }
-
-        nav a:hover {
-            color: #e4e6eb;
-        }
-
-        nav a.active {
-            color: #7c3aed;
-        }
-
-        .admin-link {
-            background: #3730a3;
-            color: #fff !important;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .admin-link:hover {
-            background: #4c1d95;
-        }
-
-        main {
-            padding: 32px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* HOME LAYOUT */
-        #home {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .home-left h1 {
-            font-size: 42px;
-            line-height: 1.2;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
-
-        .home-left p {
-            color: #a0a8b8;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 28px;
-        }
-
-        .home-left .cta-btn {
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-block;
-            transition: background 0.15s;
-            margin-bottom: 32px;
-        }
-
-        .home-left .cta-btn:hover {
-            background: #6d28d9;
-        }
-
-        .home-left ul {
-            list-style: none;
-            color: #a0a8b8;
-            font-size: 13px;
-        }
-
-        .home-left li {
-            margin-bottom: 10px;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        .home-left li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #7c3aed;
-        }
-
-        .home-right {
-            background: #1f2847;
-            border: 1px solid #2a3550;
-            border-radius: 10px;
-            padding: 32px;
-            text-align: center;
-        }
-
-        .home-right .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-
-        .home-right h2 {
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        .home-right p {
-            color: #8a92a0;
-            font-size: 13px;
-        }
-
-        /* LIVE SCAN */
-        #live-scan {
-            max-width: 640px;
-            margin: 0 auto;
-        }
-
-        #live-scan h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        #live-scan > p {
-            color: #8a92a0;
-            font-size: 13px;
-            margin-bottom: 24px;
-        }
-
-        .scan-container {
-            background: #1f2847;
-            border: 1px solid #2a3550;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .status-bar {
-            background: #0f1723;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: #a0a8b8;
-        }
-
-        .spinner {
-            width: 12px;
-            height: 12px;
-            border: 2px solid #3730a3;
-            border-top-color: #7c3aed;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            flex-shrink: 0;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .video-box {
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            border: 1px solid #2a2f47;
-        }
-
-        #webcam {
-            width: 100%;
-            height: auto;
-            display: block;
-            transform: scaleX(-1);
-            min-height: 380px;
-        }
-
-        .scan-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel {
-            flex: 1;
-            padding: 12px;
-            background: #451a03;
-            color: #fda29b;
-            border: 1px solid #7c2d12;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .btn-cancel:hover {
-            background: #5e2c1f;
-        }
-
-        /* RESULTS */
-        #results-success, #results-error {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .results-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .results-header h1 {
-            font-size: 28px;
-            margin-bottom: 12px;
-        }
-
-        .result-icon {
-            font-size: 72px;
-            margin-bottom: 16px;
-        }
-
-        .result-status {
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .result-status.success {
-            background: #0a3434;
-            border: 1px solid #1a5555;
-        }
-
-        .result-status.success h2 {
-            color: #6ee7b7;
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .result-status.error {
-            background: #3a1a1a;
-            border: 1px solid #5a2a2a;
-        }
-
-        .result-status.error h2 {
-            color: #fca5a5;
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .result-status p {
-            font-size: 12px;
-            color: #a0a8b8;
-        }
-
-        .result-details {
-            background: #1f2847;
-            border: 1px solid #2a3550;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #2a3550;
-            font-size: 13px;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: #8a92a0;
-        }
-
-        .detail-value {
-            color: #e4e6eb;
-            font-weight: 500;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .btn-primary {
-            background: #7c3aed;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #6d28d9;
-        }
-
-        .btn-secondary {
-            background: #2a3550;
-            color: #a0a8b8;
-            border: 1px solid #3a4560;
-        }
-
-        .btn-secondary:hover {
-            background: #3a4560;
-        }
-
-        /* REGISTRY */
-        #registry {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        #registry h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        #registry > p {
-            color: #8a92a0;
-            font-size: 13px;
-            margin-bottom: 24px;
-        }
-
-        .registry-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .registry-table thead {
-            background: #1f2847;
-            border-bottom: 1px solid #2a3550;
-        }
-
-        .registry-table th {
-            padding: 12px;
-            text-align: left;
-            font-size: 12px;
-            color: #a0a8b8;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .registry-table td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #2a3550;
-            font-size: 13px;
-        }
-
-        .registry-table tbody tr:hover {
-            background: #151b2f;
-        }
-
-        .registry-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status-badge.ok {
-            background: #0a3434;
-            color: #6ee7b7;
-        }
-
-        .status-badge.fail {
-            background: #3a1a1a;
-            color: #fca5a5;
-        }
-
-        /* INFO */
-        #info {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        #info h1 {
-            font-size: 28px;
-            margin-bottom: 32px;
-        }
-
-        .info-section {
-            margin-bottom: 32px;
-        }
-
-        .info-section h2 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #e4e6eb;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #2a3550;
-        }
-
-        .info-section p {
-            color: #a0a8b8;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .info-section ul {
-            margin-left: 20px;
-            color: #a0a8b8;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        @media (max-width: 768px) {
-            #home {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-
-            .home-left h1 {
-                font-size: 32px;
-            }
-
-            nav ul {
-                gap: 16px;
-            }
-
-            main {
-                padding: 20px 16px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">🎓 FaceCheck</div>
+            <div class="logo">
+                <img src="../LOGO FaceCheck.png" alt="FaceCheck Logo">
+                <span class="logo-text">FaceCheck</span>
+            </div>
             <ul>
                 <li><a href="#" class="nav-link active" onclick="switchScreen('home')">Home</a></li>
                 <li><a href="#" class="nav-link" onclick="switchScreen('live-scan')">Scansione</a></li>
                 <li><a href="#" class="nav-link" onclick="switchScreen('registry')">Registro</a></li>
                 <li><a href="#" class="nav-link" onclick="switchScreen('info')">Info</a></li>
                 <li><a href="#" class="nav-link admin-link" onclick="goToAdmin()">Admin</a></li>
+                <li><button class="theme-toggle" onclick="toggleTheme()" title="Cambia tema">🌙</button></li>
             </ul>
         </nav>
     </header>
@@ -547,8 +51,6 @@
         <!-- LIVE SCAN -->
         <div class="screen" id="live-scan">
             <h1>Scansione in corso</h1>
-            <p>Posizionati davanti alla webcam</p>
-
             <div class="scan-container">
                 <div class="status-bar">
                     <div class="spinner"></div>
@@ -556,6 +58,10 @@
                 </div>
 
                 <div class="video-box">
+                    <div class="video-loading" id="video-loading">
+                        <div class="skeleton-loader"></div>
+                        <span class="loading-text">Inizializzazione webcam...</span>
+                    </div>
                     <video id="webcam" playsinline autoplay></video>
                 </div>
 
@@ -710,6 +216,31 @@
     <script>
         let stream = null;
 
+        // Inizializza tema salvato
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                updateThemeIcon();
+            }
+        }
+
+        // Cambia tema
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcon();
+        }
+
+        // Aggiorna icona tema
+        function updateThemeIcon() {
+            const btn = document.querySelector('.theme-toggle');
+            const isLight = document.body.classList.contains('light-theme');
+            btn.textContent = isLight ? '☀️' : '🌙';
+        }
+
+        // Cambio schermata
         function switchScreen(screenName) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenName).classList.add('active');
@@ -725,19 +256,32 @@
             }
         }
 
+        // Avvia webcam
         function startWebcam() {
+            // Mostra stato di caricamento
+            const loadingDiv = document.getElementById('video-loading');
+            loadingDiv.classList.remove('hidden');
+
             navigator.mediaDevices.getUserMedia({
                 video: { facingMode: 'user' },
                 audio: false
             }).then(s => {
                 stream = s;
-                document.getElementById('webcam').srcObject = stream;
+                const videoElement = document.getElementById('webcam');
+                videoElement.srcObject = stream;
+
+                // Nasconde caricamento quando il video è pronto
+                videoElement.onloadedmetadata = () => {
+                    loadingDiv.classList.add('hidden');
+                };
             }).catch(e => {
                 console.error('Errore:', e);
+                loadingDiv.classList.add('hidden');
                 alert('Impossibile accedere alla webcam');
             });
         }
 
+        // Ferma webcam
         function stopWebcam() {
             if (stream) {
                 stream.getTracks().forEach(t => t.stop());
@@ -745,6 +289,7 @@
             }
         }
 
+        // Simula scansione
         function simulateScan() {
             const status = document.getElementById('scan-status');
             let step = 0;
@@ -762,32 +307,50 @@
             }, 1500);
         }
 
+        // Risultato successo
         function showSuccessResult() {
             const now = new Date();
             document.getElementById('result-date').textContent = now.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
             document.getElementById('result-time').textContent = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
             switchScreen('results-success');
+            // Scroll ai risultati
+            setTimeout(() => {
+                document.getElementById('results-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
+        // Risultato errore
         function showErrorResult() {
             const now = new Date();
             document.getElementById('error-date').textContent = now.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
             document.getElementById('error-time').textContent = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
             switchScreen('results-error');
+            // Scroll ai risultati
+            setTimeout(() => {
+                document.getElementById('results-error').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
+        // Annulla scansione
         function cancelScan() {
             stopWebcam();
             switchScreen('home');
         }
 
+        // Nuova scansione
         function newScan() {
             switchScreen('live-scan');
         }
 
+        // Area admin
         function goToAdmin() {
             alert('Accesso area amministratore');
         }
+
+        // Inizializza al caricamento
+        window.addEventListener('DOMContentLoaded', initTheme);
     </script>
+
+    <script src="app.js"></script>
 </body>
 </html>
