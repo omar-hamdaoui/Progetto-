@@ -1,5 +1,4 @@
 # Dipendenze Python del progetto
-# dlib viene compilato durante il build, può richiedere memoria e tempo
 dlib==19.24.0
 face-recognition==1.3.0
 Flask>=2.2,<3.0

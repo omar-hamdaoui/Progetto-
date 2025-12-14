@@ -1,18 +1,29 @@
 version: "3.8"
+
 services:
   faceapp:
     build: .
+    container_name: faceapp
     volumes:
-      - ./data:/app/data       # dataset/modelli persistenti
-      - ./:/app:cached         # montare il codice per dev (usa cached per migliori perf)
+      - ./data:/app/data                 # persistent dataset / images
+      - ./:/app:cached                   # mount source for live dev
     ports:
       - "5000:5000"
     environment:
       - PYTHONUNBUFFERED=1
+      - FACE_MATCH_THRESHOLD=0.6
+      - MAX_UPLOAD_MB=8
+      - ENCODINGS_CACHE_PATH=/app/data/encodings.pkl
     restart: unless-stopped
     healthcheck:
+      # curl is installed in image; fallback to python check could be used if desired
       test: ["CMD-SHELL", "curl -fsS http://localhost:5000/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
