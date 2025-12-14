@@ -1,20 +1,15 @@
 {
-  "name": "face-recognition-dev",
-  "dockerComposeFile": "../docker-compose.yml",
+  "name": "Face Backend Devcontainer",
+  "dockerComposeFile": ["../docker-compose.yml"],
   "service": "faceapp",
   "workspaceFolder": "/app",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.analysis.typeCheckingMode": "basic"
-      },
-      "extensions": [
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-azuretools.vscode-docker",
-        "ms-vscode-remote.remote-containers"
-      ]
-    }
-  }
+  "shutdownAction": "stopCompose",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance"
+  ],
+  "postCreateCommand": "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt || true"
 }
