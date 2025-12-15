@@ -19,10 +19,17 @@ import threading
 import logging
 import tempfile
 import pickle
+import json
+from datetime import datetime, timezone
 from typing import List, Tuple, Optional
 
 from flask import Flask, request, jsonify, send_from_directory, abort
 from werkzeug.utils import secure_filename
+
+try:
+    from face_store import FaceStore
+except Exception:
+    FaceStore = None
 
 # Lazy imports (app can start even if face_recognition not installed)
 try:
@@ -38,9 +45,68 @@ ENC_CACHE_PATH = os.environ.get("ENCODINGS_CACHE_PATH", os.path.join(IMAGES_DIR,
 THRESHOLD_DEFAULT = float(os.environ.get("FACE_MATCH_THRESHOLD", 0.6))
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", 8))
 MAX_CONTENT_LENGTH = MAX_UPLOAD_MB * 1024 * 1024
+REGISTRY_PATH = os.environ.get("REGISTRY_PATH", "data/registry.json")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 # Ensure directories exist
 os.makedirs(IMAGES_DIR, exist_ok=True)
+
+
+def _load_registry() -> list:
+    if not os.path.exists(REGISTRY_PATH):
+        return []
+    try:
+        with open(REGISTRY_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def _append_registry(entry: dict) -> None:
+    os.makedirs(os.path.dirname(REGISTRY_PATH) or ".", exist_ok=True)
+    items = _load_registry()
+    items.insert(0, entry)
+    try:
+        with open(REGISTRY_PATH, "w", encoding="utf-8") as f:
+            json.dump(items, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+@app.route("/", methods=["GET"])
+def frontend_index():
+    return send_from_directory(FRONTEND_DIR, "tmpl.html")
+
+
+@app.route("/style.css", methods=["GET"])
+def frontend_style():
+    return send_from_directory(FRONTEND_DIR, "style.css")
+
+
+@app.route("/app.js", methods=["GET"])
+def frontend_appjs():
+    return send_from_directory(FRONTEND_DIR, "app.js")
+
+
+@app.route("/LOGO FaceCheck.png", methods=["GET"])
+def frontend_logo():
+    return send_from_directory(BASE_DIR, "LOGO FaceCheck.png")
+
+
+@app.route("/api/registry", methods=["GET"])
+def api_registry():
+    return jsonify(items=_load_registry())
+
+
+@app.route("/api/rebuild", methods=["POST"])
+def api_rebuild():
+    result = build_cache_from_disk()
+    if "error" in result:
+        return jsonify(result), 500
+    return jsonify(result)
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
@@ -56,6 +122,14 @@ _known_names: List[str] = []
 _known_meta: dict = {}  # filename -> metadata (e.g. faces count)
 
 ALLOWED_EXT = {"jpg", "jpeg", "png"}
+
+_store = None
+if FaceStore is not None:
+    try:
+        _store = FaceStore(images_dir=IMAGES_DIR, cache_path=ENC_CACHE_PATH)
+        _store.load_cache()
+    except Exception:
+        _store = None
 
 
 def allowed_file(filename: str) -> bool:
@@ -97,6 +171,20 @@ def build_cache_from_disk() -> dict:
     """
     if face_recognition is None:
         return {"error": "face_recognition not available"}
+
+    # Prefer the helper FaceStore (from face-store.py) when available.
+    if _store is not None:
+        try:
+            loaded = _store.build_from_disk()
+            with _lock:
+                global _known_encodings, _known_names, _known_meta
+                _known_encodings = list(_store.encodings)
+                _known_names = list(_store.names)
+                _known_meta = dict(_store.meta)
+            logger.info("Loaded %d known faces (FaceStore)", loaded)
+            return {"loaded": int(loaded)}
+        except Exception as e:
+            logger.warning("FaceStore build failed, falling back: %s", e)
 
     encs = []
     names = []
@@ -215,6 +303,16 @@ def upload_image():
                 _known_encodings.append(encs[0])
                 _known_names.append(os.path.splitext(dest_name)[0])
             _known_meta[dest_name] = {"faces": faces_count}
+
+        if _store is not None:
+            try:
+                # Keep FaceStore cache aligned (best-effort).
+                _store.encodings = list(_known_encodings)
+                _store.names = list(_known_names)
+                _store.meta = dict(_known_meta)
+                _store.save_cache()
+            except Exception:
+                pass
         save_cache(ENC_CACHE_PATH)
         return jsonify({"filename": dest_name, "saved": True, "faces": faces_count}), 201
     except Exception as e:
@@ -276,12 +374,15 @@ def compare_endpoint():
         return jsonify({"error": "file not found"}), 404
 
     try:
-        enc_a = face_recognition.face_encodings(face_recognition.load_image_file(path_a))[0]
-        enc_b = face_recognition.face_encodings(face_recognition.load_image_file(path_b))[0]
+        if _store is not None:
+            dist = float(_store.compare_files(a, b))
+        else:
+            enc_a = face_recognition.face_encodings(face_recognition.load_image_file(path_a))[0]
+            enc_b = face_recognition.face_encodings(face_recognition.load_image_file(path_b))[0]
+            dist = float(face_recognition.face_distance([enc_a], enc_b)[0])
     except Exception as e:
         return jsonify({"error": f"cannot encode images: {str(e)}"}), 400
 
-    dist = float(face_recognition.face_distance([enc_a], enc_b)[0])
     return jsonify({"a": a, "b": b, "distance": dist, "match": dist <= threshold})
 
 
@@ -337,6 +438,17 @@ def recognize():
             "name": name,
             "distance": best_dist,
             "location": {"top": int(loc[0]), "right": int(loc[1]), "bottom": int(loc[2]), "left": int(loc[3])}
+        })
+
+    # Save a lightweight attendance entry for the first face (if any)
+    if results:
+        first = results[0]
+        ts = datetime.now(timezone.utc).isoformat()
+        _append_registry({
+            "ts": ts,
+            "name": None if first.get("name") in (None, "Unknown") else first.get("name"),
+            "status": "ok" if first.get("name") not in (None, "Unknown") else "fail",
+            "distance": first.get("distance"),
         })
 
     return jsonify(results=results)
