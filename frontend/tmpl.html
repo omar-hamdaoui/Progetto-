@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceCheck</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="../LOGO FaceCheck.png" alt="FaceCheck Logo">
+                <span class="logo-text">FaceCheck</span>
+            </div>
+            <ul>
+                <li><a href="#" class="nav-link active" onclick="switchScreen('home')">Home</a></li>
+                <li><a href="#" class="nav-link" onclick="switchScreen('live-scan')">Scansione</a></li>
+                <li><a href="#" class="nav-link" onclick="switchScreen('registry')">Registro</a></li>
+                <li><a href="#" class="nav-link" onclick="switchScreen('info')">Info</a></li>
+                <li><a href="#" class="nav-link admin-link" onclick="goToAdmin()">Admin</a></li>
+                <li><button class="theme-toggle" onclick="toggleTheme()" title="Cambia tema">🌙</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HOME -->
+        <div class="screen active" id="home">
+            <div class="home-left">
+                <h1>Riconoscimento facciale per le presenze</h1>
+                <p>Sistema automatico per la registrazione rapida e sicura delle presenze in classe. Basta uno sguardo.</p>
+                
+                <button class="cta-btn" onclick="switchScreen('live-scan')">Inizia scansione</button>
+
+                <ul>
+                    <li>Riconoscimento istantaneo</li>
+                    <li>Accuratezza fino al 99%</li>
+                    <li>Nessun contatto fisico</li>
+                    <li>Storico completo</li>
+                </ul>
+            </div>
+
+            <div class="home-right">
+                <div class="icon">🔐</div>
+                <h2>Sicuro e affidabile</h2>
+                <p>I tuoi dati rimangono privati e protetti. Utilizziamo crittografia end-to-end e database locale.</p>
+            </div>
+        </div>
+
+        <!-- RESULTS SUCCESS -->
+        <div class="screen" id="results-success">
+            <div class="results-header">
+                <h1>Riconoscimento</h1>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div class="result-icon">✅</div>
+            </div>
+
+            <div class="result-status success">
+                <h2>Riuscito</h2>
+                <p>Presenza registrata correttamente</p>
+            </div>
+
+            <div class="result-details">
+                <div class="detail-row">
+                    <span class="detail-label">Nome</span>
+                    <span class="detail-value" id="result-name">Mario Rossi</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Matricola</span>
+                    <span class="detail-value" id="result-id">MAT-2024-001</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Data</span>
+                    <span class="detail-value" id="result-date">25 novembre</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ora</span>
+                    <span class="detail-value" id="result-time">14:35</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Confidenza</span>
+                    <span class="detail-value" id="result-confidence">98.5%</span>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="switchScreen('home')">Home</button>
+                <button class="btn btn-secondary" onclick="newScan()">Scansione nuova</button>
+            </div>
+        </div>
+
+        <!-- RESULTS ERROR -->
+        <div class="screen" id="results-error">
+            <div class="results-header">
+                <h1>Riconoscimento</h1>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div class="result-icon">❌</div>
+            </div>
+
+            <div class="result-status error">
+                <h2>Non riconosciuto</h2>
+                <p>Volto non presente nel database</p>
+            </div>
+
+            <div class="result-details">
+                <div class="detail-row">
+                    <span class="detail-label">Motivo</span>
+                    <span class="detail-value">Volto non trovato</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Data tentativo</span>
+                    <span class="detail-value" id="error-date">25 novembre</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ora</span>
+                    <span class="detail-value" id="error-time">14:35</span>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="switchScreen('home')">Home</button>
+                <button class="btn btn-secondary" onclick="newScan()">Riprova</button>
+            </div>
+        </div>
+
+        <!-- REGISTRY -->
+        <div class="screen" id="registry">
+            <h1>Registro presenze</h1>
+            <p>Storico delle presenze registrate</p>
+
+            <table class="registry-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Data</th>
+                        <th>Ora</th>
+                        <th>Stato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mario Rossi</td>
+                        <td>25 novembre 2025</td>
+                        <td>14:35:22</td>
+                        <td><span class="status-badge ok">✓ Presente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Luigi Bianchi</td>
+                        <td>25 novembre 2025</td>
+                        <td>14:32:15</td>
+                        <td><span class="status-badge ok">✓ Presente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Anna Verdi</td>
+                        <td>25 novembre 2025</td>
+                        <td>14:40:08</td>
+                        <td><span class="status-badge fail">✗ Fallito</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- INFO -->
+        <div class="screen" id="info">
+            <h1>Informazioni</h1>
+
+            <div class="info-section">
+                <h2>Sistema</h2>
+                <p>FaceCheck v1.0.0 - Sistema di riconoscimento facciale per gestione presenze in ambienti scolastici e aziendali.</p>
+            </div>
+
+            <div class="info-section">
+                <h2>Tecnologie</h2>
+                <ul>
+                    <li>OpenCV per acquisizione e elaborazione video</li>
+                    <li>face_recognition per identificazione facciale</li>
+                    <li>SQLite per storage dati locali</li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h2>Supporto</h2>
+                <p>Per assistenza tecnica contatta: admin@facecheck.local</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- LIVE SCAN (dedicated screen) -->
+    <div class="screen scan-shell" id="live-scan">
+        <div class="scan-top-bar">
+            <div>
+                <p class="scan-label">Sessione attiva</p>
+                <h1>Scansione in corso</h1>
+            </div>
+            <button class="scan-back" onclick="cancelScan()">← Torna alla home</button>
+        </div>
+
+        <div class="scan-container">
+            <div class="status-bar">
+                <div class="spinner"></div>
+                <span id="scan-status">Analizzando...</span>
+            </div>
+
+            <div class="video-box">
+                <div class="video-loading" id="video-loading">
+                    <div class="skeleton-loader"></div>
+                    <span class="loading-text">Inizializzazione webcam...</span>
+                </div>
+                <video id="webcam" playsinline autoplay></video>
+            </div>
+
+            <div class="scan-controls">
+                <button class="btn-cancel" onclick="cancelScan()">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+
+        // Inizializza tema salvato
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                updateThemeIcon();
+            }
+        }
+
+        // Cambia tema
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcon();
+        }
+
+        // Aggiorna icona tema
+        function updateThemeIcon() {
+            const btn = document.querySelector('.theme-toggle');
+            const isLight = document.body.classList.contains('light-theme');
+            btn.textContent = isLight ? '☀️' : '🌙';
+        }
+
+        // Cambio schermata
+        function switchScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenName).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event?.target?.classList.add('active');
+
+            const isScan = screenName === 'live-scan';
+            document.body.classList.toggle('scan-mode', isScan);
+
+            if (isScan) {
+                startWebcam();
+                simulateScan();
+            } else {
+                stopWebcam();
+            }
+        }
+
+        // Avvia webcam
+        function startWebcam() {
+            // Mostra stato di caricamento
+            const loadingDiv = document.getElementById('video-loading');
+            loadingDiv.classList.remove('hidden');
+
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user' },
+                audio: false
+            }).then(s => {
+                stream = s;
+                const videoElement = document.getElementById('webcam');
+                videoElement.srcObject = stream;
+
+                // Nasconde caricamento quando il video è pronto
+                videoElement.onloadedmetadata = () => {
+                    loadingDiv.classList.add('hidden');
+                };
+            }).catch(e => {
+                console.error('Errore:', e);
+                loadingDiv.classList.add('hidden');
+                alert('Impossibile accedere alla webcam');
+            });
+        }
+
+        // Ferma webcam
+        function stopWebcam() {
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
+        }
+
+        // Simula scansione
+        function simulateScan() {
+            const status = document.getElementById('scan-status');
+            let step = 0;
+            const interval = setInterval(() => {
+                step++;
+                if (step === 1) {
+                    status.textContent = 'Scansione in corso...';
+                } else if (step === 2) {
+                    status.textContent = 'Volto rilevato, confronto...';
+                } else if (step === 3) {
+                    clearInterval(interval);
+                    stopWebcam();
+                    Math.random() > 0.3 ? showSuccessResult() : showErrorResult();
+                }
+            }, 1500);
+        }
+
+        // Risultato successo
+        function showSuccessResult() {
+            const now = new Date();
+            document.getElementById('result-date').textContent = now.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+            document.getElementById('result-time').textContent = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+            switchScreen('results-success');
+            // Scroll ai risultati
+            setTimeout(() => {
+                document.getElementById('results-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Risultato errore
+        function showErrorResult() {
+            const now = new Date();
+            document.getElementById('error-date').textContent = now.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+            document.getElementById('error-time').textContent = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+            switchScreen('results-error');
+            // Scroll ai risultati
+            setTimeout(() => {
+                document.getElementById('results-error').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Annulla scansione
+        function cancelScan() {
+            stopWebcam();
+            switchScreen('home');
+        }
+
+        // Nuova scansione
+        function newScan() {
+            switchScreen('live-scan');
+        }
+
+        // Area admin
+        function goToAdmin() {
+            alert('Accesso area amministratore');
+        }
+
+        // Inizializza al caricamento
+        window.addEventListener('DOMContentLoaded', initTheme);
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>
