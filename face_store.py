@@ -1,9 +1,4 @@
-"""Import-friendly wrapper for the FaceStore implementation.
-
-The original file is named `face-store.py` (with a hyphen), which cannot be
-imported as a normal Python module. This wrapper loads it via importlib and
-re-exports `FaceStore`.
-"""
+"""Import-friendly wrapper for the FaceStore implementation."""
 
 from __future__ import annotations
 
@@ -29,3 +24,4 @@ def _load_face_store_module() -> ModuleType:
 _impl = _load_face_store_module()
 
 FaceStore: Type = getattr(_impl, "FaceStore")
+
