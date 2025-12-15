@@ -48,29 +48,6 @@
             </div>
         </div>
 
-        <!-- LIVE SCAN -->
-        <div class="screen" id="live-scan">
-            <h1>Scansione in corso</h1>
-            <div class="scan-container">
-                <div class="status-bar">
-                    <div class="spinner"></div>
-                    <span id="scan-status">Analizzando...</span>
-                </div>
-
-                <div class="video-box">
-                    <div class="video-loading" id="video-loading">
-                        <div class="skeleton-loader"></div>
-                        <span class="loading-text">Inizializzazione webcam...</span>
-                    </div>
-                    <video id="webcam" playsinline autoplay></video>
-                </div>
-
-                <div class="scan-controls">
-                    <button class="btn-cancel" onclick="cancelScan()">Annulla</button>
-                </div>
-            </div>
-        </div>
-
         <!-- RESULTS SUCCESS -->
         <div class="screen" id="results-success">
             <div class="results-header">
@@ -213,6 +190,36 @@
         </div>
     </main>
 
+    <!-- LIVE SCAN (dedicated screen) -->
+    <div class="screen scan-shell" id="live-scan">
+        <div class="scan-top-bar">
+            <div>
+                <p class="scan-label">Sessione attiva</p>
+                <h1>Scansione in corso</h1>
+            </div>
+            <button class="scan-back" onclick="cancelScan()">← Torna alla home</button>
+        </div>
+
+        <div class="scan-container">
+            <div class="status-bar">
+                <div class="spinner"></div>
+                <span id="scan-status">Analizzando...</span>
+            </div>
+
+            <div class="video-box">
+                <div class="video-loading" id="video-loading">
+                    <div class="skeleton-loader"></div>
+                    <span class="loading-text">Inizializzazione webcam...</span>
+                </div>
+                <video id="webcam" playsinline autoplay></video>
+            </div>
+
+            <div class="scan-controls">
+                <button class="btn-cancel" onclick="cancelScan()">Annulla</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let stream = null;
 
@@ -248,7 +255,10 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             event?.target?.classList.add('active');
 
-            if (screenName === 'live-scan') {
+            const isScan = screenName === 'live-scan';
+            document.body.classList.toggle('scan-mode', isScan);
+
+            if (isScan) {
                 startWebcam();
                 simulateScan();
             } else {
